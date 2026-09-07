@@ -135,7 +135,7 @@ object VoiceNormalizer {
         }
     }
 
-    fun parseVoiceCommand(rawTranscript: String): ParsedVoiceCommand {
+    fun parseVoiceCommand(rawTranscript: String, lang: VoiceEngine.AppLanguage): ParsedVoiceCommand {
         val normalized = normalizeNumbers(rawTranscript)
         val slangs = recognizeSlang(normalized)
         val materialCode = mapSlangToMaterialCode(slangs)
@@ -143,10 +143,10 @@ object VoiceNormalizer {
         val intent = extractIntent(normalized)
 
         val readableMaterial = materialCode?.replace('_', ' ')?.uppercase() ?: "Scrap"
-        val confirmation = if (weight != null) {
-            "$weight Kilo $readableMaterial parsed for $intent."
-        } else {
-            "$readableMaterial inquiry parsed."
+        val confirmation = when (lang) {
+            VoiceEngine.AppLanguage.MARATHI -> if (weight != null) "$weight किलो $readableMaterial समजले आहे." else "$readableMaterial बद्दल विचारपूस."
+            VoiceEngine.AppLanguage.HINDI -> if (weight != null) "$weight किलो $readableMaterial समझ लिया गया है।" else "$readableMaterial के बारे में पूछताछ।"
+            VoiceEngine.AppLanguage.ENGLISH -> if (weight != null) "$weight kilos $readableMaterial parsed." else "$readableMaterial inquiry parsed."
         }
 
         return ParsedVoiceCommand(
@@ -221,7 +221,7 @@ class VoiceEngine(private val context: Context) : TextToSpeech.OnInitListener {
     fun mapSlangToMaterialCode(slangs: List<String>): String? = VoiceNormalizer.mapSlangToMaterialCode(slangs)
     fun extractWeightKg(normalizedText: String): Double? = VoiceNormalizer.extractWeightKg(normalizedText)
     fun extractIntent(text: String): String = VoiceNormalizer.extractIntent(text)
-    fun parseVoiceCommand(rawTranscript: String): ParsedVoiceCommand = VoiceNormalizer.parseVoiceCommand(rawTranscript)
+    fun parseVoiceCommand(rawTranscript: String): ParsedVoiceCommand = VoiceNormalizer.parseVoiceCommand(rawTranscript, currentLanguage)
 
 
     fun startListening(onResult: (String) -> Unit, onError: (String) -> Unit) {
@@ -256,7 +256,12 @@ class VoiceEngine(private val context: Context) : TextToSpeech.OnInitListener {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, currentLanguage.code)
-            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak scrap items (e.g., 'don kilo tamba bhav')")
+            val promptMsg = when (currentLanguage) {
+                AppLanguage.MARATHI -> "भंगाराचे नाव आणि वजन सांगा..."
+                AppLanguage.HINDI -> "कबाड़ का नाम और वजन बताएं..."
+                AppLanguage.ENGLISH -> "Speak scrap items (e.g., '2 kilos copper')..."
+            }
+            putExtra(RecognizerIntent.EXTRA_PROMPT, promptMsg)
         }
         try {
             speechRecognizer?.startListening(intent)

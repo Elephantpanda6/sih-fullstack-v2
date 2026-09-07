@@ -189,7 +189,12 @@ fun DashboardScreen(
                             .fillMaxWidth()
                             .height(130.dp)
                             .clickable {
-                                voiceEngine.speak("$displayName, ₹${card.spotRate.toInt()} प्रति किलो")
+                                val msg = when (selectedLanguage) {
+                                    VoiceEngine.AppLanguage.MARATHI -> "$displayName, ₹${card.spotRate.toInt()} प्रति किलो"
+                                    VoiceEngine.AppLanguage.HINDI -> "$displayName, ₹${card.spotRate.toInt()} प्रति किलो"
+                                    VoiceEngine.AppLanguage.ENGLISH -> "$displayName, ₹${card.spotRate.toInt()} per kg"
+                                }
+                                voiceEngine.speak(msg)
                                 navController.navigate("calculator?code=${card.code}&rate=${card.spotRate}&epr=${card.eprBonus}&name=${card.nameEn}")
                             },
                         shape = RoundedCornerShape(16.dp),
@@ -251,7 +256,12 @@ fun DashboardScreen(
                 // Voice Assistant Button (min 56dp height)
                 Button(
                     onClick = {
-                        voiceEngine.speak("माइक सुरू झाला आहे. बोला.")
+                        val msg = when (selectedLanguage) {
+                            VoiceEngine.AppLanguage.MARATHI -> "माइक सुरू झाला आहे. बोला."
+                            VoiceEngine.AppLanguage.HINDI -> "माइक चालू है। बोलें।"
+                            VoiceEngine.AppLanguage.ENGLISH -> "Microphone is on. Speak now."
+                        }
+                        voiceEngine.speak(msg)
                         navController.navigate("voice")
                     },
                     modifier = Modifier

@@ -236,7 +236,12 @@ fun ValuationScreen(
                         globalFinalPayout = totalOrderValue
                         isSubmitted = true
                         sharedViewModel.clearCart()
-                        voiceEngine.speak("Batch order submitted successfully.")
+                        val msg = when (voiceEngine.currentLanguage) {
+                            VoiceEngine.AppLanguage.MARATHI -> "तुमची ऑर्डर यशस्वीरित्या नोंदवली गेली आहे."
+                            VoiceEngine.AppLanguage.HINDI -> "आपका ऑर्डर सफलतापूर्वक सबमिट हो गया है।"
+                            VoiceEngine.AppLanguage.ENGLISH -> "Batch order submitted successfully."
+                        }
+                        voiceEngine.speak(msg)
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
