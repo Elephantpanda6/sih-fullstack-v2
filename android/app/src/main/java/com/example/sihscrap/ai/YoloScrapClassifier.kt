@@ -15,16 +15,14 @@ class YoloScrapClassifier(private val context: Context) {
     private var ortSession: OrtSession? = null
     
     private val INPUT_SIZE = 224
-    private val NUM_CLASSES = 27
+    private val NUM_CLASSES = 15
     private val NUM_ANCHORS = 1029
 
     private val LABELS = arrayOf(
-        "Air-conditioner", "Cameras", "Computer-keyboard", "Computer-monitor", 
-        "Computer-mouse", "Copiers", "Desktop", "Dishwashers", "Drone", 
-        "Headphone", "Home-entertainment", "Kitchen-appliance", "Laptop", 
-        "Mobile-phone", "Outdoor-cooking", "Oven", "Perfume", "Personal-care", 
-        "Printer", "Refrigerator", "Remote-control", "Speaker", "Television", 
-        "Vacuum-cleaner", "Washing-machine", "Watch", "Webcam"
+        "copper_bare_bright", "copper_armature", "brass_honey", "aluminium_extrusions",
+        "aluminium_castings", "aluminium_utensils", "heavy_steel_sariya", "light_iron_patra",
+        "cast_iron", "high_grade_server_pcb", "mobile_phone_pcb", "lead_acid_battery",
+        "li_ion_cells", "cardboard_carton", "pet_plastic"
     )
 
     init {
@@ -109,8 +107,8 @@ class YoloScrapClassifier(private val context: Context) {
 
         val detectedName = LABELS[bestClassIndex]
         return ClassificationResult(
-            categoryCode = detectedName.lowercase().replace("-", "_"),
-            categoryName = detectedName.replace("-", " "),
+            categoryCode = detectedName,
+            categoryName = detectedName.replace("_", " ").split(" ").joinToString(" ") { it.capitalize() },
             confidence = bestScore,
             rustPercentage = 15.5f, // Mask rust placeholder
             materialTier = MaterialTier.EMERALD_GREEN,

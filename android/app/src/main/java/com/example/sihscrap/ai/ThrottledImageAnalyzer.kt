@@ -18,7 +18,7 @@ class ThrottledImageAnalyzer(
 
     private val TAG = "ThrottledAnalyzer"
     private var lastAnalyzedTimestamp: Long = 0L
-    private val THROTTLE_INTERVAL_MS: Long = 1500L // 1 frame per 1.5 seconds
+    private val THROTTLE_INTERVAL_MS: Long = 300L // 3 frames per second for responsive scanning
 
     override fun analyze(imageProxy: ImageProxy) {
         val currentTimestamp = System.currentTimeMillis()

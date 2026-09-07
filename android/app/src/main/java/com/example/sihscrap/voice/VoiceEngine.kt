@@ -168,9 +168,9 @@ class VoiceEngine(private val context: Context) : TextToSpeech.OnInitListener {
     private var speechRecognizer: SpeechRecognizer? = null
 
     enum class AppLanguage(val code: String, val displayName: String, val locale: Locale) {
-        HINDI("hi", "हिन्दी", Locale("hi", "IN")),
-        MARATHI("mr", "मराठी", Locale("mr", "IN")),
-        ENGLISH("en", "English", Locale.US)
+        HINDI("hi-IN", "हिन्दी", Locale("hi", "IN")),
+        MARATHI("mr-IN", "मराठी", Locale("mr", "IN")),
+        ENGLISH("en-IN", "English", Locale("en", "IN"))
     }
 
     var currentLanguage: AppLanguage = AppLanguage.HINDI
