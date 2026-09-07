@@ -47,6 +47,8 @@ fun LocatorScreen(navController: NavController) {
     var selectedTab by remember { mutableStateOf(0) } // 0: List, 1: Map View
     var bookedRecyclerName by remember { mutableStateOf<String?>(null) }
 
+    var offlineMode by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         isLoading = true
         try {
@@ -110,20 +112,38 @@ fun LocatorScreen(navController: NavController) {
                 }
             } else if (selectedTab == 1) {
                 // Map Radar Spatial View
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(if (offlineMode) Icons.Default.CloudOff else Icons.Default.CloudQueue, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Force Offline Cache Mode", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                    }
+                    Switch(
+                        checked = offlineMode,
+                        onCheckedChange = { offlineMode = it }
+                    )
+                }
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp)
-                        .padding(vertical = 12.dp),
+                        .padding(bottom = 12.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         AndroidView(
                             factory = { ctx ->
+                                Configuration.getInstance().load(ctx, ctx.getSharedPreferences("osmdroid", android.content.Context.MODE_PRIVATE))
                                 MapView(ctx).apply {
                                     setTileSource(TileSourceFactory.MAPNIK)
                                     setMultiTouchControls(true)
+                                    setUseDataConnection(!offlineMode)
                                     controller.setZoom(13.0)
                                     controller.setCenter(GeoPoint(userLat, userLon))
                                     
@@ -144,6 +164,7 @@ fun LocatorScreen(navController: NavController) {
                                 }
                             },
                             update = { view ->
+                                view.setUseDataConnection(!offlineMode)
                                 view.controller.setCenter(GeoPoint(userLat, userLon))
                             },
                             modifier = Modifier.fillMaxSize()
