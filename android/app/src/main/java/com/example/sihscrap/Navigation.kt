@@ -9,18 +9,38 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.sihscrap.ui.main.MainScreen
+import com.example.sihscrap.ui.screens.RoleSelectionScreen
+import com.example.sihscrap.ui.screens.RecyclerDashboardScreen
 
 @Composable
 fun MainNavigation() {
-  val backStack = rememberNavBackStack(Main)
+  val backStack = rememberNavBackStack(RoleSelection)
 
   NavDisplay(
     backStack = backStack,
     onBack = { backStack.removeLastOrNull() },
     entryProvider =
       entryProvider {
+        entry<RoleSelection> {
+          RoleSelectionScreen(
+              onCollectorClick = { 
+                  backStack.removeLastOrNull()
+                  backStack.add(Main) 
+              },
+              onRecyclerClick = { 
+                  backStack.removeLastOrNull()
+                  backStack.add(RecyclerDashboard) 
+              }
+          )
+        }
         entry<Main> {
           MainScreen(onItemClick = { navKey -> backStack.add(navKey) }, modifier = Modifier.safeDrawingPadding().padding(16.dp))
+        }
+        entry<RecyclerDashboard> {
+          RecyclerDashboardScreen(onBack = { 
+              backStack.removeLastOrNull()
+              backStack.add(RoleSelection)
+          })
         }
       },
   )
