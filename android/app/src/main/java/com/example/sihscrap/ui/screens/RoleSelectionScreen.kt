@@ -1,13 +1,26 @@
 package com.example.sihscrap.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Language
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.sihscrap.R
 
 @Composable
@@ -16,32 +29,96 @@ fun RoleSelectionScreen(
     onRecyclerClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
-        // The cropped PNG image serves as the entire UI
-        Image(
-            painter = painterResource(id = R.drawable.role_selection_bg),
-            contentDescription = "Role Selection Background",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+    // Green gradient background
+    val backgroundBrush = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFF2E7D32), // Dark Green
+            Color(0xFF81C784)  // Light Green
         )
+    )
 
-        // Overlay transparent clickable boxes over the Collector and Recycler cards
-        // The cards are roughly side-by-side in the middle of the screen
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(backgroundBrush)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Header
         Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 200.dp, bottom = 100.dp) // Approximate vertical bounds of the cards
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
         ) {
-            Box(
+            Column {
+                Text(
+                    text = "Welcome to",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Light
+                )
+                Text(
+                    text = "EcoSetu",
+                    color = Color.White,
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            
+            // Language Button
+            Surface(
+                color = Color(0xFFC5E1A5), 
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Language,
+                        contentDescription = "Language",
+                        tint = Color(0xFF2E7D32),
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "EN | हिन्दी | मराठी",
+                        color = Color(0xFF2E7D32),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(60.dp))
+
+        // Cropped Image Buttons Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Collector Image Button
+            Image(
+                painter = painterResource(id = R.drawable.btn_collector),
+                contentDescription = "Collector Role",
+                contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(24.dp))
                     .clickable(onClick = onCollectorClick)
             )
-            Box(
+
+            // Recycler Image Button
+            Image(
+                painter = painterResource(id = R.drawable.btn_recycler),
+                contentDescription = "Recycler Role",
+                contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(24.dp))
                     .clickable(onClick = onRecyclerClick)
             )
         }
