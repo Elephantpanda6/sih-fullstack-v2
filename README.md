@@ -1,4 +1,4 @@
-﻿# SIH Smart Scrap & E-Waste Valuation System (v2 Fullstack)
+# SIH Smart Scrap & E-Waste Valuation System (v2 Fullstack)
 
 [![Android CI](https://img.shields.io/badge/Android-Jetpack%20Compose-3DDC84?logo=android&logoColor=white)](android/)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.12-009688?logo=fastapi&logoColor=white)](backend/)
@@ -13,8 +13,8 @@ An enterprise-grade, offline-first circular economy platform built for the **Sma
 
 You can install and run the native Android application directly on any Android smartphone without building from source code:
 
-* 🚀 **Direct APK Download (Root):** [**`app-debug.apk` (Direct Download)**](https://raw.githubusercontent.com/Elephantpanda6/sih-fullstack-v2/main/app-debug.apk)
-* 📦 **Mirror / Releases:** [**`releases/app-debug.apk`**](https://github.com/Elephantpanda6/sih-fullstack-v2/blob/main/releases/app-debug.apk?raw=true)
+* 🚀 **Direct APK Download (Root):** [**`app-debug.apk` (Direct Download)**](https://github.com/Elephantpanda6/sih-fullstack-v2/raw/main/app-debug.apk)
+* 📦 **Mirror / Releases:** [**`releases/app-debug.apk`**](https://github.com/Elephantpanda6/sih-fullstack-v2/raw/main/releases/app-debug.apk)
 * **Target Platforms:** Android 8.0 (API 26) through Android 14+ (API 34). Optimized specifically for ultra-budget **Android Go** devices (<60MB active RAM footprint).
 
 ---
