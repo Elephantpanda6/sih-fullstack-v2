@@ -30,7 +30,8 @@ fun MainNavigation() {
               onRecyclerClick = { 
                   backStack.removeLastOrNull()
                   backStack.add(RecyclerDashboard) 
-              }
+              },
+              voiceEngine = com.example.sihscrap.voice.VoiceEngine(androidx.compose.ui.platform.LocalContext.current)
           )
         }
         entry<Main> {
