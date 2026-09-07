@@ -96,7 +96,7 @@ fun CameraScreen(navController: NavController, sharedViewModel: SharedViewModel)
 
             val imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888)
+                .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
                 .build()
                 .also { analysis ->
                     analysis.setAnalyzer(
@@ -423,7 +423,7 @@ fun CameraScreen(navController: NavController, sharedViewModel: SharedViewModel)
                                         code = currentResult.categoryCode,
                                         name = currentResult.categoryName,
                                         rust = currentResult.rustPercentage,
-                                        weight = 5.0
+                                        weight = 0.0 // Start at 0kg so user weighs it later
                                     )
                                 )
                                 // We don't lock the shutter or navigate, allowing continuous scanning!

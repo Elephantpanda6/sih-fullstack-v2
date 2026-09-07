@@ -131,10 +131,21 @@ fun ValuationScreen(
 
                     val currentWeight = item.weight
                     val grossValue = currentWeight * spotRate * purity
-                    val rustDeductionPct = (item.rust / 100.0) * 0.20
+                    val rustDeductionPct = (item.rust / 100.0) * 0.15 // Backend uses ~15% baseline penalty
                     val rustDeductionAmount = grossValue * rustDeductionPct
                     val eprTotalBonus = currentWeight * eprBonusPerKg
-                    val finalPayout = Math.max(0.0, grossValue - rustDeductionAmount + eprTotalBonus)
+                    
+                    val grossMaterialValue = Math.max(0.0, grossValue - rustDeductionAmount)
+                    
+                    val processingFeePerKg = when {
+                        item.code.contains("e_waste") -> 6.0
+                        item.code.contains("battery") -> 4.0
+                        else -> 1.5
+                    }
+                    val processingFee = currentWeight * processingFeePerKg
+                    val dealerMargin = grossMaterialValue * 0.10 // 10% dealer margin
+                    
+                    val finalPayout = Math.max(0.0, grossMaterialValue - processingFee - dealerMargin + eprTotalBonus)
                     val co2Saved = currentWeight * material.co2SavingPerKg
 
                     totalOrderValue += finalPayout

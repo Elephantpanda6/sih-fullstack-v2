@@ -44,35 +44,14 @@ class ThrottledImageAnalyzer(
     }
 
     private fun imageProxyToBitmap(imageProxy: ImageProxy): Bitmap? {
-        val planes = imageProxy.planes
-        if (planes.isEmpty()) return null
-
-        val yBuffer: ByteBuffer = planes[0].buffer
-        val uBuffer: ByteBuffer? = if (planes.size > 1) planes[1].buffer else null
-        val vBuffer: ByteBuffer? = if (planes.size > 2) planes[2].buffer else null
-
-        val ySize = yBuffer.remaining()
-        val uSize = uBuffer?.remaining() ?: 0
-        val vSize = vBuffer?.remaining() ?: 0
-
-        val nv21 = ByteArray(ySize + uSize + vSize)
-        yBuffer.get(nv21, 0, ySize)
-
-        if (uBuffer != null && vBuffer != null) {
-            vBuffer.get(nv21, ySize, vSize)
-            uBuffer.get(nv21, ySize + vSize, uSize)
+        return try {
+            val bitmap = imageProxy.toBitmap()
+            // Scale down to YOLO input size (224x224)
+            Bitmap.createScaledBitmap(bitmap, 224, 224, false)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to convert ImageProxy to Bitmap: ${e.message}")
+            null
         }
-
-        val yuvImage = YuvImage(nv21, ImageFormat.NV21, imageProxy.width, imageProxy.height, null)
-        val out = ByteArrayOutputStream()
-        yuvImage.compressToJpeg(Rect(0, 0, imageProxy.width, imageProxy.height), 75, out)
-        val imageBytes = out.toByteArray()
-
-        val options = BitmapFactory.Options().apply {
-            inSampleSize = calculateInSampleSize(imageProxy.width, imageProxy.height, 224, 224)
-        }
-        val fullBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size, options) ?: return null
-        return Bitmap.createScaledBitmap(fullBitmap, 224, 224, false)
     }
 
     private fun calculateInSampleSize(width: Int, height: Int, reqWidth: Int, reqHeight: Int): Int {
