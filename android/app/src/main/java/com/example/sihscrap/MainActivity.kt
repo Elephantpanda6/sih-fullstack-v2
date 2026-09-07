@@ -56,7 +56,16 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val sharedViewModel: SharedViewModel = viewModel()
                     
-                    NavHost(navController = navController, startDestination = "dashboard") {
+                    NavHost(navController = navController, startDestination = "role_selection") {
+                        composable("role_selection") {
+                            RoleSelectionScreen(
+                                onCollectorClick = { navController.navigate("dashboard") },
+                                onRecyclerClick = { navController.navigate("recycler_dashboard") }
+                            )
+                        }
+                        composable("recycler_dashboard") {
+                            RecyclerDashboardScreen(onBack = { navController.popBackStack() })
+                        }
                         composable("dashboard") {
                             DashboardScreen(navController, voiceEngine)
                         }
