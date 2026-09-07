@@ -49,23 +49,23 @@ object VoiceNormalizer {
 
         // Whole numbers
         val wholeNumberMap = mapOf(
-            "ek" to "1", "एक" to "1",
-            "don" to "2", "do" to "2", "दोन" to "2", "दो" to "2",
-            "teen" to "3", "तीन" to "3",
-            "char" to "4", "chaar" to "4", "चार" to "4",
-            "paach" to "5", "paanch" to "5", "पाच" to "5", "पांच" to "5",
-            "saha" to "6", "chhah" to "6", "सहा" to "6", "छह" to "6",
-            "saat" to "7", "सात" to "7",
-            "aath" to "8", "आठ" to "8",
-            "nau" to "9", "nav" to "9", "नऊ" to "9", "नौ" to "9",
-            "daha" to "10", "das" to "10", "दहा" to "10", "दस" to "10",
-            "pandhra" to "15", "pandrah" to "15", "पंधरा" to "15", "पंद्रह" to "15",
-            "vis" to "20", "bees" to "20", "वीस" to "20", "बीस" to "20",
-            "panchvis" to "25", "pachees" to "25", "पंचवीस" to "25", "पच्चीस" to "25",
-            "tis" to "30", "tees" to "30", "तीस" to "30",
-            "chalis" to "40", "chaalis" to "40", "चाळीस" to "40", "चालीस" to "40",
-            "pannas" to "50", "pachas" to "50", "पन्नास" to "50", "पचास" to "50",
-            "shambhar" to "100", "sau" to "100", "शंभर" to "100", "सौ" to "100"
+            "ek" to "1", "एक" to "1", "one" to "1",
+            "don" to "2", "do" to "2", "दोन" to "2", "दो" to "2", "two" to "2",
+            "teen" to "3", "तीन" to "3", "three" to "3",
+            "char" to "4", "chaar" to "4", "चार" to "4", "four" to "4",
+            "paach" to "5", "paanch" to "5", "पाच" to "5", "पांच" to "5", "five" to "5",
+            "saha" to "6", "chhah" to "6", "सहा" to "6", "छह" to "6", "six" to "6",
+            "saat" to "7", "सात" to "7", "seven" to "7",
+            "aath" to "8", "आठ" to "8", "eight" to "8",
+            "nau" to "9", "nav" to "9", "नऊ" to "9", "नौ" to "9", "nine" to "9",
+            "daha" to "10", "das" to "10", "दहा" to "10", "दस" to "10", "ten" to "10",
+            "pandhra" to "15", "pandrah" to "15", "पंधरा" to "15", "पंद्रह" to "15", "fifteen" to "15",
+            "vis" to "20", "bees" to "20", "वीस" to "20", "बीस" to "20", "twenty" to "20",
+            "panchvis" to "25", "pachees" to "25", "पंचवीस" to "25", "पच्चीस" to "25", "twenty five" to "25",
+            "tis" to "30", "tees" to "30", "तीस" to "30", "thirty" to "30",
+            "chalis" to "40", "chaalis" to "40", "चाळीस" to "40", "चालीस" to "40", "forty" to "40",
+            "pannas" to "50", "pachas" to "50", "पन्नास" to "50", "पचास" to "50", "fifty" to "50",
+            "shambhar" to "100", "sau" to "100", "शंभर" to "100", "सौ" to "100", "hundred" to "100"
         )
         for ((word, num) in wholeNumberMap) {
             result = result.replace(Regex("(?i)\\b$word\\b"), num)

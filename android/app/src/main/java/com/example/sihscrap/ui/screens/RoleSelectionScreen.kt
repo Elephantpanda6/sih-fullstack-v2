@@ -11,7 +11,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import com.example.sihscrap.voice.VoiceEngine
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -27,8 +32,11 @@ import com.example.sihscrap.R
 fun RoleSelectionScreen(
     onCollectorClick: () -> Unit,
     onRecyclerClick: () -> Unit,
+    voiceEngine: VoiceEngine,
     modifier: Modifier = Modifier
 ) {
+    var currentLanguage by remember { mutableStateOf(voiceEngine.currentLanguage) }
+    
     // Green gradient background
     val backgroundBrush = Brush.verticalGradient(
         colors = listOf(
@@ -70,7 +78,14 @@ fun RoleSelectionScreen(
             Surface(
                 color = Color(0xFFC5E1A5), 
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .clickable {
+                        val langs = VoiceEngine.AppLanguage.values()
+                        val nextIndex = (currentLanguage.ordinal + 1) % langs.size
+                        currentLanguage = langs[nextIndex]
+                        voiceEngine.currentLanguage = currentLanguage
+                    }
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
@@ -84,10 +99,10 @@ fun RoleSelectionScreen(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "EN | हिन्दी | मराठी",
+                        text = currentLanguage.displayName,
                         color = Color(0xFF2E7D32),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }

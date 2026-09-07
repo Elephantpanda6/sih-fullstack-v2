@@ -60,7 +60,8 @@ class MainActivity : ComponentActivity() {
                         composable("role_selection") {
                             RoleSelectionScreen(
                                 onCollectorClick = { navController.navigate("dashboard") },
-                                onRecyclerClick = { navController.navigate("recycler_dashboard") }
+                                onRecyclerClick = { navController.navigate("recycler_dashboard") },
+                                voiceEngine = voiceEngine
                             )
                         }
                         composable("recycler_dashboard") {
