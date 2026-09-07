@@ -21,10 +21,34 @@ data class ParsedVoiceCommand(
 )
 
 object VoiceNormalizer {
+    private fun levenshtein(s1: String, s2: String): Int {
+        val edits = Array(s1.length + 1) { IntArray(s2.length + 1) }
+        for (i in 0..s1.length) edits[i][0] = i
+        for (j in 0..s2.length) edits[0][j] = j
+        for (i in 1..s1.length) {
+            for (j in 1..s2.length) {
+                val cost = if (s1[i - 1] == s2[j - 1]) 0 else 1
+                edits[i][j] = minOf(
+                    edits[i - 1][j] + 1,
+                    edits[i][j - 1] + 1,
+                    edits[i - 1][j - 1] + cost
+                )
+            }
+        }
+        return edits[s1.length][s2.length]
+    }
+
+    private fun isFuzzyMatch(word: String, target: String): Boolean {
+        if (word == target) return true
+        if (word.length <= 3 || target.length <= 3) return word == target
+        val distance = levenshtein(word, target)
+        val allowedTypos = if (target.length <= 5) 1 else 2
+        return distance <= allowedTypos
+    }
+
     fun normalizeNumbers(text: String): String {
         var result = text.lowercase()
 
-        // Replace Devanagari digits
         val devanagariDigits = mapOf(
             '०' to '0', '१' to '1', '२' to '2', '३' to '3', '४' to '4',
             '५' to '5', '६' to '6', '७' to '7', '८' to '8', '९' to '9'
@@ -33,7 +57,6 @@ object VoiceNormalizer {
             result = result.replace(dev, eng)
         }
 
-        // Fractional words
         val fractionMap = mapOf(
             "paav" to "0.25", "paon" to "0.25", "पाव" to "0.25",
             "ardha" to "0.5", "aadha" to "0.5", "अर्धा" to "0.5", "आधा" to "0.5",
@@ -47,7 +70,6 @@ object VoiceNormalizer {
             result = result.replace(Regex("(?i)\\b$word\\b"), num)
         }
 
-        // Whole numbers
         val wholeNumberMap = mapOf(
             "ek" to "1", "एक" to "1", "one" to "1",
             "don" to "2", "do" to "2", "दोन" to "2", "दो" to "2", "two" to "2",
@@ -74,18 +96,32 @@ object VoiceNormalizer {
         return result
     }
 
+    private val scrapMapping = mapOf(
+        "copper_bare_bright" to listOf("tambha", "tamba", "taamba", "copper", "तांबा", "तांबे", "copar", "coper"),
+        "brass_honey" to listOf("peetal", "pital", "brass", "पीतल", "पितळ", "bras"),
+        "heavy_steel_sariya" to listOf("lokhand", "loha", "sariya", "लोहा", "लोखंड", "सरिया", "iron", "steel", "stil"),
+        "light_iron_patra" to listOf("patra", "पत्रा", "tin", "sheet"),
+        "aluminium_extrusions" to listOf("aluminium", "एल्युमिनियम", "अ‍ॅल्युमिनियम", "aluminam", "alumunium", "aluminum"),
+        "high_grade_server_pcb" to listOf("e-kachra", "pcb", "ई-कचरा", "ewaste", "e-waste", "circuit", "board", "motherboard"),
+        "lead_acid_battery" to listOf("battery", "बैटरी", "बॅटरी", "bateri", "inverter"),
+        "cardboard_carton" to listOf("raddi", "kabaad", "रद्दी", "कबाड़", "paper", "cardboard", "pudha", "puttha", "carton"),
+        "pet_plastic" to listOf("batli", "bottle", "plastic", "प्लास्टिक", "प्लॅस्टिक", "botle", "botal")
+    )
+
     fun recognizeSlang(text: String): List<String> {
-        val slangs = listOf(
-            "lokhand", "loha", "tambha", "tamba", "taamba", "peetal", "pital",
-            "bhangar", "patra", "sariya", "e-kachra", "raddi", "kabaad", "batli",
-            "copper", "brass", "aluminium", "battery", "pcb"
-        )
         val found = mutableListOf<String>()
         val words = text.lowercase().split(Regex("[\\s,]+"))
         for (w in words) {
-            val clean = w.replace(Regex("[^a-zA-Z\\-]"), "")
-            if (slangs.contains(clean) && !found.contains(clean)) {
-                found.add(clean)
+            val clean = w.replace(Regex("[^a-zA-Z\u0900-\u097F\\-]"), " ")
+            if (clean.isEmpty()) continue
+            
+            for ((_, targets) in scrapMapping) {
+                for (target in targets) {
+                    if (isFuzzyMatch(clean, target) && !found.contains(target)) {
+                        found.add(target)
+                        break
+                    }
+                }
             }
         }
         return found
@@ -93,23 +129,15 @@ object VoiceNormalizer {
 
     fun mapSlangToMaterialCode(slangs: List<String>): String? {
         for (s in slangs) {
-            when (s) {
-                "tambha", "tamba", "taamba", "copper" -> return "copper_bare_bright"
-                "peetal", "pital", "brass" -> return "brass_honey"
-                "lokhand", "loha", "sariya" -> return "heavy_steel_sariya"
-                "patra" -> return "light_iron_patra"
-                "aluminium" -> return "aluminium_extrusions"
-                "e-kachra", "pcb" -> return "high_grade_server_pcb"
-                "battery" -> return "lead_acid_battery"
-                "raddi", "kabaad" -> return "cardboard_carton"
-                "batli" -> return "pet_plastic"
+            for ((code, targets) in scrapMapping) {
+                if (targets.contains(s)) return code
             }
         }
         return null
     }
 
     fun extractWeightKg(normalizedText: String): Double? {
-        val pattern = Regex("(\\d+(?:\\.\\d+)?)\\s*(?:kilo|kg|किलो|केजी)")
+        val pattern = Regex("(\\d+(?:\\.\\d+)?)\\s*(?:kilo|kg|किलो|केजी|kilogram)")
         val match = pattern.find(normalizedText)
         if (match != null) {
             return match.groupValues[1].toDoubleOrNull()
@@ -126,13 +154,21 @@ object VoiceNormalizer {
 
     fun extractIntent(text: String): String {
         val t = text.lowercase()
-        return when {
-            t.contains("pickup") || t.contains("pathva") || t.contains("bhejo") || t.contains("booking") -> "pickup_request"
-            t.contains("submit") || t.contains("jama") || t.contains("confirm") || t.contains("vikri") || t.contains("bechna") -> "valuation_submit"
-            t.contains("price") || t.contains("bhav") || t.contains("rate") || t.contains("mulya") || t.contains("kiti") || t.contains("kitna") -> "price_inquiry"
-            t.contains("wajan") || t.contains("vajan") || t.contains("weight") || t.contains("tolo") -> "weight_query"
-            else -> "price_inquiry"
+        val intents = mapOf(
+            "pickup_request" to listOf("pickup", "pathva", "bhejo", "booking", "book", "aao", "ya", "pathav"),
+            "valuation_submit" to listOf("submit", "jama", "confirm", "vikri", "bechna", "bechu", "sell", "done"),
+            "weight_query" to listOf("wajan", "vajan", "weight", "tolo", "moza", "wazan")
+        )
+        
+        val words = t.split(Regex("[\\s,]+")).map { it.replace(Regex("[^a-zA-Z\u0900-\u097F]"), "") }
+        for (w in words) {
+            for ((intent, triggers) in intents) {
+                for (trigger in triggers) {
+                    if (isFuzzyMatch(w, trigger)) return intent
+                }
+            }
         }
+        return "price_inquiry"
     }
 
     fun parseVoiceCommand(rawTranscript: String, lang: VoiceEngine.AppLanguage): ParsedVoiceCommand {
@@ -160,6 +196,7 @@ object VoiceNormalizer {
         )
     }
 }
+
 
 class VoiceEngine(private val context: Context) : TextToSpeech.OnInitListener {
     private val TAG = "VoiceEngine"
