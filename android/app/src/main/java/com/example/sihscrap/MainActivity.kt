@@ -1,4 +1,4 @@
-package com.example.sihscrap
+﻿package com.example.sihscrap
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -23,7 +23,7 @@ import com.example.sihscrap.voice.VoiceEngine
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sihscrap.ui.SharedViewModel
 
-import org.osmdroid.config.Configuration
+
 
 class MainActivity : ComponentActivity() {
     private lateinit var voiceEngine: VoiceEngine
@@ -31,8 +31,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Initialize OSMDroid globally before ANY map view is created
-        Configuration.getInstance().load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
+
+
         Configuration.getInstance().userAgentValue = "SihScrapApp/1.0 (contact@sihscrap.com)"
 
         voiceEngine = VoiceEngine(this)
