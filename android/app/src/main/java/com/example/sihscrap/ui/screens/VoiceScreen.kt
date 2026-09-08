@@ -1,4 +1,4 @@
-package com.example.sihscrap.ui.screens
+﻿package com.example.sihscrap.ui.screens
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -26,8 +26,16 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VoiceScreen(navController: NavController, voiceEngine: VoiceEngine) {
+    val lang = voiceEngine.currentLanguage
+
+    val fallbackTranscript = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "माइकवर टॅप करा आणि बोला..."
+        VoiceEngine.AppLanguage.HINDI -> "माइक पर टैप करें और बोलें..."
+        VoiceEngine.AppLanguage.ENGLISH -> "Tap the microphone and speak..."
+    }
+
     var isListening by remember { mutableStateOf(false) }
-    var transcript by remember { mutableStateOf("Tap the microphone and speak in Hindi or Marathi...") }
+    var transcript by remember { mutableStateOf(fallbackTranscript) }
     var parsedCommand by remember { mutableStateOf<ParsedVoiceCommand?>(null) }
 
     val infiniteTransition = rememberInfiniteTransition(label = "waveform")
@@ -48,10 +56,70 @@ fun VoiceScreen(navController: NavController, voiceEngine: VoiceEngine) {
         voiceEngine.speak(parsed.spokenConfirmation)
     }
 
+    val voiceActiveLabel = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "मराठी व्हॉइस अ‍ॅक्टिव्ह"
+        VoiceEngine.AppLanguage.HINDI -> "हिंदी वॉयस एक्टिव"
+        VoiceEngine.AppLanguage.ENGLISH -> "Voice Active"
+    }
+
+    val transcriptLabel = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "लिप्यंतरण:"
+        VoiceEngine.AppLanguage.HINDI -> "प्रतिलेखन:"
+        VoiceEngine.AppLanguage.ENGLISH -> "Transcription:"
+    }
+
+    val extractedCmdLabel = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "काढलेला आदेश"
+        VoiceEngine.AppLanguage.HINDI -> "निकाला गया कमांड"
+        VoiceEngine.AppLanguage.ENGLISH -> "Extracted Command"
+    }
+
+    val materialLabel = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "साहित्य:"
+        VoiceEngine.AppLanguage.HINDI -> "सामग्री:"
+        VoiceEngine.AppLanguage.ENGLISH -> "Material:"
+    }
+
+    val weightLabel = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "वजन:"
+        VoiceEngine.AppLanguage.HINDI -> "वजन:"
+        VoiceEngine.AppLanguage.ENGLISH -> "Normalized Weight:"
+    }
+
+    val slangLabel = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "ओळखलेला शब्द:"
+        VoiceEngine.AppLanguage.HINDI -> "पहचाना गया शब्द:"
+        VoiceEngine.AppLanguage.ENGLISH -> "Recognized Slang:"
+    }
+
+    val confirmBtnLabel = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "पुष्टी करा आणि किंमत मोजा"
+        VoiceEngine.AppLanguage.HINDI -> "पुष्टि करें और कीमत की गणना करें"
+        VoiceEngine.AppLanguage.ENGLISH -> "Confirm & Calculate Payout"
+    }
+
+    val sampleCmdsLabel = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "नमुना कमांड:"
+        VoiceEngine.AppLanguage.HINDI -> "नमूना कमांड:"
+        VoiceEngine.AppLanguage.ENGLISH -> "Sample Commands:"
+    }
+
+    val listeningText = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "ऐकत आहे... थांबवण्यासाठी टॅप करा"
+        VoiceEngine.AppLanguage.HINDI -> "सुन रहा हूँ... रोकने के लिए टैप करें"
+        VoiceEngine.AppLanguage.ENGLISH -> "Listening... Tap to stop"
+    }
+
+    val tapMicText = when (lang) {
+        VoiceEngine.AppLanguage.MARATHI -> "बोलण्यासाठी माइक टॅप करा"
+        VoiceEngine.AppLanguage.HINDI -> "बोलने के लिए माइक पर टैप करें"
+        VoiceEngine.AppLanguage.ENGLISH -> "Tap Mic to Speak"
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Vernacular Voice Assistant", fontWeight = FontWeight.Bold) },
+                title = { Text(if(lang == VoiceEngine.AppLanguage.ENGLISH) "Vernacular Voice Assistant" else if (lang == VoiceEngine.AppLanguage.HINDI) "वॉयस असिस्टेंट" else "व्हॉइस असिस्टंट", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -102,7 +170,7 @@ fun VoiceScreen(navController: NavController, voiceEngine: VoiceEngine) {
 
                     if (!isListening && parsedCommand == null) {
                         Text(
-                            "Hindi / Marathi Voice Active",
+                            voiceActiveLabel,
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -119,7 +187,7 @@ fun VoiceScreen(navController: NavController, voiceEngine: VoiceEngine) {
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Transcription:", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                    Text(transcriptLabel, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = transcript,
@@ -144,7 +212,7 @@ fun VoiceScreen(navController: NavController, voiceEngine: VoiceEngine) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Extracted Command", fontWeight = FontWeight.Bold)
+                            Text(extractedCmdLabel, fontWeight = FontWeight.Bold)
                             Surface(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp)) {
                                 Text(
                                     cmd.intent.replace('_', ' ').uppercase(),
@@ -160,21 +228,21 @@ fun VoiceScreen(navController: NavController, voiceEngine: VoiceEngine) {
 
                         if (cmd.matchedMaterialCode != null) {
                             Text(
-                                "Material: ${cmd.matchedMaterialCode.replace('_', ' ').uppercase()}",
+                                "$materialLabel ${cmd.matchedMaterialCode.replace('_', ' ').uppercase()}",
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
 
                         if (cmd.extractedWeightKg != null) {
                             Text(
-                                "Normalized Weight: ${cmd.extractedWeightKg} kg",
+                                "$weightLabel ${cmd.extractedWeightKg} kg",
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
 
                         if (cmd.detectedSlangs.isNotEmpty()) {
                             Text(
-                                "Recognized Slang: ${cmd.detectedSlangs.joinToString(", ")}",
+                                "$slangLabel ${cmd.detectedSlangs.joinToString(", ")}",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -192,7 +260,7 @@ fun VoiceScreen(navController: NavController, voiceEngine: VoiceEngine) {
                         ) {
                             Icon(Icons.Default.Check, contentDescription = null)
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Confirm & Calculate Payout")
+                            Text(confirmBtnLabel)
                         }
                     }
                 }
@@ -201,7 +269,7 @@ fun VoiceScreen(navController: NavController, voiceEngine: VoiceEngine) {
             Spacer(modifier = Modifier.weight(1f))
 
             // Sample Quick Slang Voice Queries
-            Text("Sample Commands:", style = MaterialTheme.typography.labelSmall)
+            Text(sampleCmdsLabel, style = MaterialTheme.typography.labelSmall)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -266,7 +334,7 @@ fun VoiceScreen(navController: NavController, voiceEngine: VoiceEngine) {
 
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                if (isListening) "Listening... Tap to stop" else "Tap Mic to Speak",
+                if (isListening) listeningText else tapMicText,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.SemiBold
             )
